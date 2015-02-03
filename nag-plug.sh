@@ -37,5 +37,8 @@ echo "installation of plugin complete" >> $log
 chown -R nagios:nagios /usr/local/nagios/
 echo "ownership of folders changed " >> $log
 
-## Add heck_init_service
+## Add check_init_service
 wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios_checks/master/checks/check_init_service -P /usr/local/nagios/libexec
+
+## Add check_sar_perf.py
+wget --no-check-certificate https://raw.githubusercontent.com/nickanderson/check-sar-perf/master/check_sar_perf.py -P /usr/local/nagios/libexec
