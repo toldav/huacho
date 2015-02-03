@@ -36,3 +36,6 @@ echo "installation of plugin complete" >> $log
 # Change the ownership of nagios path
 chown -R nagios:nagios /usr/local/nagios/
 echo "ownership of folders changed " >> $log
+
+## Add heck_init_service
+wget wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios_checks/master/checks/check_init_service -P /usr/local/nagios/libexec
