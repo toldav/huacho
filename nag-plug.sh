@@ -42,3 +42,5 @@ wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios
 
 ## Add check_sar_perf.py
 wget --no-check-certificate https://raw.githubusercontent.com/nickanderson/check-sar-perf/master/check_sar_perf.py -P /usr/local/nagios/libexec
+chmod +x /usr/local/nagios/libexec/check_sar_perf.py
+chown nagios.nagios /usr/local/nagios/libexec/check_sar_perf.py
