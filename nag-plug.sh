@@ -53,4 +53,10 @@ chmod +x /usr/local/nagios/libexec/check_sar_perf.py
 chown nagios.nagios /usr/local/nagios/libexec/check_sar_perf.py
 echo "Added check_sar_perf.py" >> $log
 
+# Add check_exit_status.pl
+wget --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/check_exit_status.pl -P /usr/local/nagios/libexec
+chmod +x /usr/local/nagios/libexec/check_exit_status.pl
+chown nagios.nagios /usr/local/nagios/libexec/check_exit_status.pl
+echo "Added check_exit_status.pl" >> $log
+
 #wget  --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/nag-plug.sh; chmod +x /tmp/nag-plug.sh
