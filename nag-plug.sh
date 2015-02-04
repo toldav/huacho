@@ -8,7 +8,7 @@ log=/tmp/nrpe-agent.log
 # maybe this packages: yum install gcc glibc glibc-common
 # Pre-requirements: 
 rpm -qa gcc openssl-devel >> $log
-yum install gcc openssl-devel
+#yum install gcc openssl-devel
 
 echo "user Nagios Added" >> $log
 mkdir /tmp/nrpe-agent ; cd /tmp/nrpe-agent
