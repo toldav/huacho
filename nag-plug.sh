@@ -52,3 +52,5 @@ wget --no-check-certificate https://raw.githubusercontent.com/nickanderson/check
 chmod +x /usr/local/nagios/libexec/check_sar_perf.py
 chown nagios.nagios /usr/local/nagios/libexec/check_sar_perf.py
 echo "Added check_sar_perf.py" >> $log
+
+#wget  --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/nag-plug.sh; chmod +x /tmp/nag-plug.sh
