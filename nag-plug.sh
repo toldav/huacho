@@ -43,7 +43,7 @@ echo "ownership of folders changed " >> $log
 ## Add CPU perf
 wget --no-check-certificate https://raw.githubusercontent.com/skywalka/check-cpu-perf/master/check_cpu_perf.sh -P /usr/local/nagios/libexec
 chmod +x /usr/local/nagios/libexec/check_cpu_perf.sh
-chmod nagios.nagios /usr/local/nagios/libexec/check_cpu_perf.sh
+chown nagios.nagios /usr/local/nagios/libexec/check_cpu_perf.sh
 echo "Added check_cpu_perf.sh" >> $log
 
 ## Add check_sar_perf.py
