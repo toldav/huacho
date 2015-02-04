@@ -38,10 +38,12 @@ chown -R nagios:nagios /usr/local/nagios/
 echo "ownership of folders changed " >> $log
 
 ## Add check_init_service
-wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios_checks/master/checks/check_init_service -P /usr/local/nagios/libexec
+#wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios_checks/master/checks/check_init_service -P /usr/local/nagios/libexec
 
 ## Add CPU perf
 wget https://raw.githubusercontent.com/skywalka/check-cpu-perf/master/check_cpu_perf.sh
+chmod +x /usr/local/nagios/libexec/check_cpu_perf.sh
+chmod nagios.nagios /usr/local/nagios/libexec/check_cpu_perf.sh
 
 ## Add check_sar_perf.py
 wget --no-check-certificate https://raw.githubusercontent.com/nickanderson/check-sar-perf/master/check_sar_perf.py -P /usr/local/nagios/libexec
