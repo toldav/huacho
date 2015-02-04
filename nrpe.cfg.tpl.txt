@@ -1,0 +1,22 @@
+### MISC SYSTEM METRICS ###
+command[check_users]=/usr/local/nagios/libexec/check_users -w 5 -c 10
+command[check_load]=/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,25,20
+command[check_hda1]=/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /dev/hda1
+command[check_zombie_procs]=/usr/local/nagios/libexec/check_procs -w 5 -c 10 -s Z
+command[check_total_procs]=/usr/local/nagios/libexec/check_procs -w 150 -c 200
+command[check_procs]=/usr/local/nagios/libexec/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
+
+### GENERIC SERVICES ###
+#command[check_init_service]=/usr/local/nagios/libexec/check_init_service $ARG1$
+#command[check_services]=/usr/local/nagios/libexec/check_services -p $ARG1$
+
+### TSM Client ###
+command[tsm_client]=/usr/local/nagios/libexec/check_tsm_client
+
+### Filesystems ###
+command[check_disk]=/usr/local/nagios/libexec/check_disk -w 10% -c 5% -p / -p /var -p /tmp -p /home -p /boot -p /usr -A -e
+
+### Server Health ###
+command[check_uptime]=/usr/local/nagios/libexec/check_uptime -w $ARG1$ -c $ARG2$ -u $ARG3$
+command[check_exit_status]=/usr/local/nagios/libexec/check_exit_status.pl -s /etc/init.d/sssd
+command[check_cpu_perf]=/usr/local/nagios/libexec/check_cpu_perf $ARG1$ $ARG2$
