@@ -41,7 +41,7 @@ echo "ownership of folders changed " >> $log
 #wget --no-check-certificate  https://raw.githubusercontent.com/jamespo/jp_nagios_checks/master/checks/check_init_service -P /usr/local/nagios/libexec
 
 ## Add CPU perf
-wget https://raw.githubusercontent.com/skywalka/check-cpu-perf/master/check_cpu_perf.sh
+wget --no-check-certificate https://raw.githubusercontent.com/skywalka/check-cpu-perf/master/check_cpu_perf.sh -P /usr/local/nagios/libexec
 chmod +x /usr/local/nagios/libexec/check_cpu_perf.sh
 chmod nagios.nagios /usr/local/nagios/libexec/check_cpu_perf.sh
 echo "Added check_cpu_perf.sh" >> $log
