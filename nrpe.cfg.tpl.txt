@@ -13,6 +13,9 @@ command[check_procs]=/usr/local/nagios/libexec/check_procs -w $ARG1$ -c $ARG2$ -
 ### TSM Client ###
 command[tsm_client]=/usr/local/nagios/libexec/check_tsm_client
 
+### Oracle RMAN ###
+command[check_rman]=/u02/scripts/nagios/check_rman_log.sh $ARG1$
+
 ### Filesystems ###
 command[check_disk]=/usr/local/nagios/libexec/check_disk -w 10% -c 5% -p / -p /var -p /tmp -p /home -p /boot -p /usr -A -e
 
