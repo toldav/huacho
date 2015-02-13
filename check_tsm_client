@@ -1,37 +1,71 @@
-#!/bin/ksh
+#!/bin/ksh93
 #
 # Kron shell script to check if TSM client is running and working..
-# if the date on the last line in dsmsched.log is more then 1 day the TSM client is not working.
-#
-# MC rev 1.0 11/18/13
-#
+## Read dsm.sys to start multiply dsmc daemons.  It is for hosts with Oracle
+##  database(s) running TDP for Oracle with Lanfree, but it should work for
+##  all Linux hosts.
+
 app="TSM Client:"
-PROGPATH=$(echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,')
-. ${PROGPATH}/utils.sh
+PROGNAME=`/bin/basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
 
-LOG=/var/tsm/dsmsched.log
+. $PROGPATH/utils.sh
 
-line=$(ps -ef |grep "dsmc sched" | grep -v grep | wc -l)
-if [[ ${line} -eq 0 ]]
+typeset -i x=0
+grep -i SErvername /opt/tivoli/tsm/client/ba/bin/dsm.sys | grep -v ^* | awk '{print $2}' | while read dname
+do
+        x=$((++x))
+        (( ${x} == 1 )) && continue
+        daemons="${daemons} ${dname}"
+done
+grep -i SchedLogName /opt/tivoli/tsm/client/ba/bin/dsm.sys | grep -v ^* |awk '{print $2}' | while read log
+do
+        logs="${logs} ${log}"
+done
+
+line=$(ps -ef |grep "dsmc sched$" | grep -v grep | wc -l)
+if (( ${line} == 0 ))
 then
         print "${app} CRITICAL down"
         exit ${STATE_CRITICAL}
-else
-        if [[ -r $LOG ]]
-        then
-                dates="$(date +%m/%d/%Y) $(date +%m/%d/%y) $(date +%D --date='1 day ago') $(date +%m/%d/%Y --date='1 day ago')"
-                DATE=`tail -n 1 $LOG | awk '{print $1}'`
-                if echo ${dates} | grep -q "${DATE}"
-                then
-                        print "${app} OK"
-                        exit ${STATE_OK}
-
-                else
-                        print "${app} CRITICAL. Last TSM log date:${date}"
-                        exit ${STATE_CRITICAL}
-                fi
-        else
-                print "${app} WARNING, dsmc is running but can't read dsmsched.log"
-                exit ${STATE_WARNING}
-        fi
 fi
+for daemon in ${daemons}
+do
+        line=$(ps -ef | grep -- "dsmc \sched -se=${daemon}" | grep dsmc | wc -l)
+        if (( ${line} == 0 ))
+        then
+                print "${app} ${daemon} CRITICAL down"
+        	exit ${STATE_CRITICAL}
+        fi
+done
+
+dates="$(date +%m/%d/%Y) $(date +%m/%d/%y) $(date +%D --date='1 day ago') $(date +%m/%d/%Y --date='1 day ago')"
+for LOG in ${logs}
+do
+	grep -q tdp ${LOG} && msgsch="/u07 " || msgsch=""
+	if [[ -r $LOG ]]
+        then
+
+	   if [ $LOG = "/var/tsm/dsmsched.log" ] ; then			## Regular TSM Log
+	       #
+	       DATE=`grep "Waiting to be contacted by the server" $LOG |tail -1 | awk '{print $1}'`
+	   else
+	       DATE=`tail -n 1 $LOG | awk '{print $1}'`			## TDP Log
+	   fi
+
+           if echo ${dates} | grep -q "${DATE}"
+           then
+			continue
+	   else
+			print "${app} ${msgsch}CRITICAL. Last ${LOG} date:${date}"
+                        exit ${STATE_CRITICAL}
+           fi
+	else
+		print "${app} WARNING, dsmc is running but can't read ${LOG}"	
+		exit ${STATE_WARNING}
+	fi
+done
+
+print "TSM client: OK"
+exit ${STATUS_OK}
