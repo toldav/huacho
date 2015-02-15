@@ -10,6 +10,8 @@ log=/tmp/nrpe-agent.log
 rpm -qa gcc openssl-devel >> $log
 #yum install gcc openssl-devel
 
+## check IF dsmc 2.5 or 2.6 for tsm to work
+
 echo "user Nagios Added" >> $log
 mkdir /tmp/nrpe-agent ; cd /tmp/nrpe-agent
 echo "/tmp/nrpe-agent direcory created " >> $log
