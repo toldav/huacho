@@ -1,0 +1,77 @@
+#!/bin/ksh93
+#
+# Kron shell script to check if TSM client is running and working..
+## Read dsm.sys to start multiply dsmc daemons.  It is for hosts with Oracle
+##  database(s) running TDP for Oracle with Lanfree, but it should work for
+##  all Linux hosts.
+##     for Linux release 5 and 6
+
+app="TSM Client:"
+PROGNAME=`/bin/basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
+
+. $PROGPATH/utils.sh
+
+typeset -i x=0
+grep -i SErvername /opt/tivoli/tsm/client/ba/bin/dsm.sys | grep -v ^* | awk '{print $2}' | while read dname
+do
+        x=$((++x))
+        (( ${x} == 1 )) && continue
+        daemons="${daemons} ${dname}"
+done
+grep -i SchedLogName /opt/tivoli/tsm/client/ba/bin/dsm.sys | grep -v ^* |awk '{print $2}' | while read log
+do
+        logs="${logs} ${log}"
+done
+
+line=$(ps -ef |grep "dsmc sched$" | grep -v grep | wc -l)
+if (( ${line} == 0 ))
+then
+        print "${app} CRITICAL down. Call Linux SysAdm to do: service dsmc restart"
+        exit ${STATE_CRITICAL}
+fi
+for daemon in ${daemons}
+do
+        line=$(ps -ef | grep -- "dsmc sched -se=${daemon}" | grep dsmc | wc -l)
+        if (( ${line} == 0 ))
+        then
+                print "${app} ${daemon} CRITICAL down. Call Linux SysAdm to do: service dsmc restart"
+        	exit ${STATE_CRITICAL}
+        fi
+done
+
+dates="$(date +%m/%d/%Y) $(date +%m/%d/%y) $(date +%D --date='1 day ago') $(date +%m/%d/%Y --date='1 day ago')"
+for LOG in ${logs}
+do
+	if echo ${LOG} | grep -q tdp 
+	then
+		daemon=$(echo ${LOG} | awk -F\/ '{print $4}')
+	else
+		daemon=""
+	fi
+	if [[ -r $LOG ]]
+        then
+
+	   if [ $LOG = "/var/tsm/dsmsched.log" ] ; then			## Regular TSM Log
+	       #
+	       DATE=`grep "Waiting to be contacted by the server" $LOG |tail -1 | awk '{print $1}'`
+	   else
+	       DATE=`tail -n 1 $LOG | awk '{print $1}'`			## TDP Log
+	   fi
+
+           if echo ${dates} | grep -q "${DATE}"
+           then
+			continue
+	   else
+			print "${app} ${msgsch}CRITICAL. Last ${LOG} date:${date}. Call Linux SysAdm to do: service dsmc restart"
+                        exit ${STATE_CRITICAL}
+           fi
+	else
+		print "${app} ${msgsch}WARNING, dsmc is running but can't read ${LOG}. Call Linux SysAdm to make all can write to ${LOG}"	
+		exit ${STATE_WARNING}
+	fi
+done
+
+print "TSM client: OK"
+exit ${STATUS_OK}
