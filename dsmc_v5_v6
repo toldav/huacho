@@ -1,0 +1,107 @@
+#!/bin/ksh93
+ 
+## Created by Edgardo Ramirez
+## October 25, 2007
+## Edit Andrew Grabowski-July 6, 2010
+## Purpose:Create entries for chkconfig - Allows start and stop as service
+## Edit Sam Pappachan - Dec 17, 2012 - disabled dsmcad, modified restart, status functions
+## Version 1.3
+## Edit Kwong Kam - July 2 2013
+## Read dsm.sys to start multiply dsmc daemons.  It is for hosts with Oracle
+##  database(s) running TDP for Oracle with Lanfree, but it should work for
+##  all Linux hosts.
+##
+# chkconfig: 2345 98 11
+# Description: IBM Tivoli Storage Manager Server Service - dsmc
+ 
+ 
+start() {
+typeset -i x=0
+grep -i SErvername /opt/tivoli/tsm/client/ba/bin/dsm.sys | grep -v ^* | while read daemon
+do
+        x=$((++x))
+        [[ ${x} -eq 1 ]] && continue
+        print $daemon | awk '{print $2}' | read dname
+        daemons="${daemons} ${dname}"
+done
+RUNNING=`ps -ef | grep "dsmc sched"$| grep -v grep | wc -l`
+###DEBUG PARAMETER#########
+#echo "RUNNING=" $RUNNING
+###########################
+if [ $RUNNING -gt 0 ]
+then
+echo "DSMC Service Is Already Runnning..."
+else
+export LANG=en_US
+echo -n "Starting DSMC Service..."
+nohup dsmc sched </dev/null >/dev/null 2>&1 &
+echo " "
+dsmc q sched|grep 'Session established with server'
+echo "Done!"
+fi
+for daemon in ${daemons}
+do
+        RUNNING=`ps -ef | grep -- "dsmc sched -se=${daemon}" | grep -v grep | wc -l`
+        if [ $RUNNING -gt 0 ]
+        then
+                echo "Service dsmc sched -se=${daemon} is already runnning..."
+        else
+                export LANG=en_US
+                echo -n "Starting dsmc sched -se=${daemon} ..."
+                nohup dsmc sched -se=${daemon} </dev/null >/dev/null 2>&1 &
+                echo "... Done!"
+        fi
+done
+
+}
+ 
+stopdaemon() {
+RUNNING=`ps -ef | grep "dsmc sched" | grep -v grep | wc -l`
+if [ $RUNNING -gt 0 ]
+then
+echo -n "Shutting Down DSMC Service..."
+pidof dsmc | xargs kill 9
+echo "Done!"
+sleep 1
+ps -ef | grep "dsmc sched" | grep -v grep | awk '{print $1 "\t" $2 "\t"$5 "\t"$8,$9,$10}'
+else
+echo "DSMC Service Is Already Stopped..."
+fi
+}
+ 
+status() {
+RUNNING=`ps -ef | grep "dsmc sched" | grep -v grep | wc -l`
+if [ $RUNNING -eq 0 ]
+then
+echo "DSMC Service Is Not running..."
+else
+echo "DSMC Service Is Running..."
+echo -e  "User\tPID\tTime\tProcess"
+ps -ef | grep "dsmc sched" | grep -v grep | awk '{print $1 "\t" $2 "\t"$5 "\t"$8,$9,$10}'
+fi
+}
+ 
+ 
+OPT=$1
+case $OPT in
+"start")
+start
+;;
+"stop")
+stopdaemon
+;;
+"restart")
+stopdaemon
+sleep 1
+start
+;;
+"status")
+status
+;;
+*)
+echo "Usage: $0 {start | stop | restart | status}"
+exit 1
+;;
+esac
+ 
+exit 0
