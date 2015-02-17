@@ -68,7 +68,7 @@ echo "Added check_exit_status.pl" >> $log
 # Over write check_tsm_client new Version by MK
 cp -p /usr/local/nagios/libexec/check_tsm_client /usr/local/nagios/libexec/check_tsm_client.bak
 #wget --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/check_tsm_client -O /usr/local/nagios/libexec/check_tsm_client
-wget --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/check_tsm_client_v5_v6 -O / usr/local/nagios/libexec/check_tsm_client
+wget --no-check-certificate https://raw.githubusercontent.com/toldav/huacho/master/check_tsm_client_v5_v6 -O /usr/local/nagios/libexec/check_tsm_client
 #chmod +x /usr/local/nagios/libexec/check_tsm_client
 chown nagios.nagios /usr/local/nagios/libexec/check_tsm_client
 echo "Over write check_tsm_client" >> $log
