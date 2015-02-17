@@ -11,6 +11,10 @@ rpm -qa gcc openssl-devel >> $log
 #yum install gcc openssl-devel
 
 ## check IF dsmc 2.5 or 2.6 for tsm to work
+uname -a >> $log
+
+## tsm_client or release 5 & 6
+cat /etc/*release >> $log
 
 echo "user Nagios Added" >> $log
 mkdir /tmp/nrpe-agent ; cd /tmp/nrpe-agent
