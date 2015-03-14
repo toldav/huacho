@@ -33,7 +33,7 @@ then
 fi
 for daemon in ${daemons}
 do
-        line=$(ps -ef | grep -- "dsmc sched -se=${daemon}" | grep dsmc | wc -l)
+        line=$(ps -ef | grep -- "dsmc sched -se=${daemon}" | grep -v grep | grep dsmc | wc -l)
         if (( ${line} == 0 ))
         then
                 print "${app} ${daemon} CRITICAL down. Call Linux SysAdm to do: service dsmc restart"
